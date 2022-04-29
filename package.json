@@ -1,0 +1,18 @@
+{
+  "name": "devcamper",
+  "version": "1.0.0",
+  "description": "Devcamper Backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tushar Sinha",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
