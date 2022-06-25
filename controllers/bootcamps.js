@@ -150,3 +150,24 @@ exports.getBootcampInRadius = asyncHandler(async (req, res, next) => {
                 count: bootcamps.length
         });
 });
+
+//@desc     Upload phot to botcamp
+//@route    PUT/api/v1/bootcamps/:id/photo
+//@access   Private
+
+exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
+        const bootcamp = await Bootcamp.findById(req.params.id);
+        if (!bootcamp) {
+                return next(new ErrorResponse(`Bootcamp not found`, 400)); 
+        }
+        
+        if(!req.files){
+            return next(new ErrorResponse(`Please Upload A file`, 400));    
+        }
+        const file = req.files.file;
+        
+        //Make Sure the image is a photo
+        if(!file.mimetype.startsWith('image')){
+                return next(new ErrorResponse(`Please Upload an image  file`,400)); 
+        }
+});

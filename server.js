@@ -1,6 +1,7 @@
 const express=require('express');
 const dotenv= require('dotenv');
 const morgan= require('morgan');
+const fileupload= require('express-fileupload')
 const errorHandler=require('./middileware/error')
 const connectDB=require('./config/db');
 
@@ -26,6 +27,8 @@ if(process.env.NODE_ENV==='development'){
     app.use(morgan('dev'));
 }
 
+//File Uploading
+app.use(fileupload());
 
 
 // Mount Router
