@@ -1,3 +1,4 @@
+const path=require('path');
 const Bootcamp = require('../models/Bootcamp');
 const asyncHandler = require('../middileware/async')
 const ErrorResponse = require('../utils/errorResponse');
@@ -10,68 +11,7 @@ const geocoder = require('../utils/geoCoder');
 //@access   Public
 
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
-        let query;
-
-        //Copy req.query
-        const reqQuery = { ...req.query };
-
-        //Fields to exclude
-        const removeFields = ['select', 'sort', 'page', 'limit'];
-
-        //Loop over removeFeild and delete them from query
-        removeFields.forEach(prams => delete reqQuery[prams]);
-
-        // Create query String
-        let queryStr = JSON.stringify(reqQuery);
-
-        // Create Query String($gt,$gte,etc)
-        queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
-
-        // Finding Resource
-        query = Bootcamp.find(JSON.parse(queryStr)).populate('courses');
-
-        //Select Field
-        if (req.query.select) {
-                const fields = req.query.select.split(',').join(" ");
-                query = query.select(fields);
-        }
-        //sort 
-        if (req.query.sort) {
-                const sortBy = req.query.sort.split(',').join(" ");
-                query = query.sort(sortBy);
-        } else {
-                query = query.sort('-createdAt');
-        }
-
-        //pagination
-        const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 25;
-        const startIndex = (page - 1) * limit;
-        const endIndex = page * limit;
-        const total = await Bootcamp.countDocuments();
-
-
-        query = query.skip(startIndex).limit(limit);
-
-        //Executing the query
-        const bootcamp = await query;
-
-        //Pagination result
-        const pagination = {}
-        if (endIndex < total) {
-                pagination.next = {
-                        page: page + 1,
-                        limit
-                }
-        }
-        if (startIndex > 0) {
-                pagination.prev = {
-                        page: page - 1,
-                        limit
-                }
-        }
-
-        res.status(200).json({ success: true, count: bootcamp.length, pagination, data: bootcamp });
+        res.status(200).json(res.advancedResults);
 });
 
 
@@ -170,4 +110,24 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
         if(!file.mimetype.startsWith('image')){
                 return next(new ErrorResponse(`Please Upload an image  file`,400)); 
         }
+
+        //CHECK FILE SIZE
+        if(file.size>process.env.MAX_FILE_UPLOAD){
+                return next(new ErrorResponse(`Please Upload an image  less than ${process.env.MAX_FILE_UPLOAD}`,400)); 
+        }
+
+        //Create custom filename
+        file.name= `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
+        file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async err=>{
+                if(err){
+                        console.log(err);
+                        return next(new ErrorResponse(`Problem with file upload`,500));
+                }
+                await Bootcamp.findByIdAndUpdate(req.params.id, {photo:file.name});      
+        });
+        res.status(200).json({
+                success: true,
+                data:file.name
+        });
 });

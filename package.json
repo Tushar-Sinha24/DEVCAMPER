@@ -10,9 +10,11 @@
   "author": "Tushar Sinha",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.0",
     "express": "^4.18.0",
     "express-fileupload": "^1.4.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.2",
     "morgan": "^1.10.0",
     "node-geocoder": "^4.0.0",
