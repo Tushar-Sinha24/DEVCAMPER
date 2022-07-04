@@ -5,6 +5,7 @@ const morgan= require('morgan');
 const fileupload= require('express-fileupload')
 const errorHandler=require('./middileware/error')
 const connectDB=require('./config/db');
+const cookieParser=require('cookie-parser');
 
 
 //Load env vars
@@ -25,9 +26,14 @@ const app=express();
 //body parser
 app.use(express.json());
 
+//Cookie parser
+app.use(cookieParser());
+
 if(process.env.NODE_ENV==='development'){
     app.use(morgan('dev'));
 }
+
+
 
 //File Uploading
 app.use(fileupload());
