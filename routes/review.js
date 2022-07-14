@@ -1,6 +1,6 @@
 const express = require('express');
 
-const {getReviews ,getReview, addReview} = require('../controllers/review')
+const {getReviews ,getReview, addReview, updateReview, deleteReview} = require('../controllers/review')
 
 const Review =require('../models/Review');
 const advancedResult = require('../middileware/advancedResult');
@@ -13,8 +13,12 @@ router.route('/')
     path:"bootcamp",
     select:'name description'
 }),getReviews)
-.post(protect , authorize('user','admins') , addReview)
+.post(protect , authorize('user','admin') , addReview)
 
-router.route('/:id').get(getReview);
+router.route('/:id')
+.get(getReview)
+.put(protect , authorize('user','admin') , updateReview)
+.delete(protect , authorize('user','admin') , deleteReview)
+
 
 module.exports = router; 

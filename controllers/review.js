@@ -42,7 +42,6 @@ exports.getReview = asyncHandler(async (req, res, next) => {
 
 //@desc     Add Review
 //@route    POST/api/v1/bootcamp/:bootcampID/reviews
-//@route    GET/api/v1/bootcamp/:bootacmpId/reviews
 //@access   Private
 exports.addReview = asyncHandler(async (req, res, next) => {
     req.body.bootcamp = req.params.bootcampId;
@@ -62,3 +61,57 @@ exports.addReview = asyncHandler(async (req, res, next) => {
         data:review
     });
 });
+
+//@desc     Update Review
+//@route    PUT/api/v1/reviews/:id
+//@access   Private
+exports.updateReview = asyncHandler(async (req, res, next) => {
+
+    let review = await Review.findById(req.params.id);
+
+    if (!review) {
+        return next(new ErrorResponse(`No Review With id of ${req.params.id}`,404));
+    }
+
+    //Make Sure reviw belongs to user or is admin
+    if(review.user.toString() !== req.user.id && req.user.role !== 'admin'){
+        return next(new ErrorResponse(`Not Authorised to update Review`,401));
+    }
+    
+    review= await Review.findByIdAndUpdate(req.params.id,req.body,{
+        new:true,
+        runValidators:true
+    })
+
+    res.status(201).json({
+        success:true,
+        data:review
+    });
+});
+
+
+//@desc     Delete Review
+//@route    PUT/api/v1/reviews/:id
+//@access   Private
+exports.deleteReview = asyncHandler(async (req, res, next) => {
+
+    let review = await Review.findById(req.params.id);
+
+    if (!review) {
+        return next(new ErrorResponse(`No Review With id of ${req.params.id}`,404));
+    }
+
+    //Make Sure reviw belongs to user or is admin
+    if(review.user.toString() !== req.user.id && req.user.role !== 'admin'){
+        return next(new ErrorResponse(`Not Authorised to update Review`,401));
+    }
+    
+    await review.remove()
+
+    res.status(201).json({
+        success:true,
+        data:review
+    });
+});
+
+
