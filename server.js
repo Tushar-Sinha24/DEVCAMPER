@@ -7,6 +7,8 @@ const errorHandler=require('./middileware/error')
 const connectDB=require('./config/db');
 const cookieParser=require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
+const helmet = require("helmet");
+var xss = require('xss-clean')
 
 
 //Load env vars
@@ -43,6 +45,12 @@ app.use(fileupload());
 
 //Sanitize data
 app.use(mongoSanitize());
+
+//Set Security headers
+app.use(helmet());
+
+//Prevent XSS attack
+app.use(xss())
 
 //set static folder
 app.use(express.static(path.join(__dirname,'public')));
