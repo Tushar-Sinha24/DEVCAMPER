@@ -8,7 +8,11 @@ const connectDB=require('./config/db');
 const cookieParser=require('cookie-parser');
 const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require("helmet");
-var xss = require('xss-clean')
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
+const cors = require('cors')
+
 
 
 //Load env vars
@@ -51,6 +55,22 @@ app.use(helmet());
 
 //Prevent XSS attack
 app.use(xss())
+
+//Rate Limiting
+const limiter = rateLimit({
+	windowMs: 10 * 60 * 1000, //10Min
+	max: 100, 
+	standardHeaders: true, 
+	
+});
+app.use(limiter);
+
+//Prevent http pram pollution
+app.use(hpp());
+
+//Enable CORS
+app.use(cors());
+
 
 //set static folder
 app.use(express.static(path.join(__dirname,'public')));
