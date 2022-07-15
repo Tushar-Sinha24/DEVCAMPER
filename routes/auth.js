@@ -1,5 +1,5 @@
 const express = require('express');
-const{register, login ,getMe ,forgotPassword , resetPassword,updateDetails, updatePassword} =require('../controllers/auth')
+const{register, login ,getMe ,forgotPassword , resetPassword,updateDetails, updatePassword,logout} =require('../controllers/auth')
 
 const router = express.Router();
 
@@ -17,5 +17,7 @@ router.put('/updatepassword',protect, updatePassword);
 router.put('/resetpassword/:resettoken',resetPassword);
 
 router.get('/me',protect, getMe);
+
+router.get('/logout', logout);
 
 module.exports=router;

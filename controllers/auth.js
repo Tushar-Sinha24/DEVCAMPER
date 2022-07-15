@@ -53,28 +53,21 @@ exports.login =asyncHandler(async(req,res,next) =>{
     res.status(200).json({ success: true , token});
 }); 
 
-//Get token from model, create cookie and send response
-const sendTokenResponse =(user , statusCode,res)=>{
-    //create token
-    const token=user.getSignedJwtTokens();
 
-    const option={
-        expires:new Date(Date.now() +process.env.JWT_COOKIE_EXPIRE*24*60*60*1000),
+//@desc     Log user out / clerar cookie
+//@route    GET/api/v1/auth/logout
+//@access   Private
+exports.logout =asyncHandler(async(req,res,next)=>{
+    res.cookie('token','none',{
+        expires:new Date(Date.now()+10*1000),
         httpOnly:true
-    };
-
-
-    if(process.env.NODE_ENV==='production'){
-        option.secure=true;
-    }
-
-    res.status(statusCode)
-    .cookie('token',token,option)
-    .json({
+    })
+    res.status(200).json({
         success:true,
-        token
-    });
-}
+        data:[]
+    })
+});
+
 
 //@desc     Get current logged in user
 //@route    POST/api/v1/auth/me
@@ -195,3 +188,27 @@ exports.updatePassword =asyncHandler(async(req,res,next)=>{
 
     
 });
+
+
+//Get token from model, create cookie and send response
+const sendTokenResponse =(user , statusCode,res)=>{
+    //create token
+    const token=user.getSignedJwtTokens();
+
+    const option={
+        expires:new Date(Date.now() +process.env.JWT_COOKIE_EXPIRE*24*60*60*1000),
+        httpOnly:true
+    };
+
+
+    if(process.env.NODE_ENV==='production'){
+        option.secure=true;
+    }
+
+    res.status(statusCode)
+    .cookie('token',token,option)
+    .json({
+        success:true,
+        token
+    });
+}
